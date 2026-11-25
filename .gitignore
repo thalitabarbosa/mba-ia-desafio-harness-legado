@@ -3,3 +3,6 @@ node_modules
 dist
 # estado local de cada cópia (portas, pids, logs, anexos)
 .balcao/
+
+# gerado por npm run up
+web/.env.local

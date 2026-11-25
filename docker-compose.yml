@@ -1,3 +1,5 @@
+# Um Postgres por cópia do projeto: `npm run up` sobe este arquivo com
+# `docker compose -p <projeto-da-copia>` e escolhe uma porta livre em BALCAO_DB_PORT.
 services:
   db:
     image: postgres:16
@@ -6,9 +8,14 @@ services:
       POSTGRES_PASSWORD: balcao
       POSTGRES_DB: balcao
     ports:
-      - "5432:5432"
+      - "127.0.0.1:${BALCAO_DB_PORT:-5432}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U balcao -d balcao"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
 
 volumes:
   pgdata:
