@@ -28,6 +28,7 @@ Orquestrador: [`scripts/gates/run.mjs`](../scripts/gates/run.mjs).
 | R1 | Nenhum comentário de supressão (`eslint-disable`, `@ts-ignore`, `@ts-expect-error`, `@ts-nocheck`) em `api/src` e `web/src` | verificador AST próprio | `scripts/gates/regras.mjs` |
 | R2 | Nenhum endereço fixo (`localhost`, `127.0.0.1`, `0.0.0.0`, `[::1]`, `/tmp/`) fora de `api/src/config/` e `web/src/config/` | verificador AST próprio | `scripts/gates/regras.mjs` |
 | R3 | `@prisma/client` só em `api/src/repositories/` | dependency-cruiser | `.dependency-cruiser.cjs` |
+| R4 | Todo caminho e todo comando (`npm run`, `node`, `bash`, `cd`) citado no `AGENTS.md` existe | verificador próprio | `scripts/gates/docs.mjs` |
 
 ### Imports só de tipo (G6, G8)
 
@@ -48,6 +49,8 @@ Uma busca por `process.env` deixaria passar `process['env']`, `const { env } = p
 - **R2 — sem endereço fixo fora de config/.** Foi a primeira trava da segunda worktree: CORS preso em `http://localhost:5173`, front chamando `http://localhost:4000` em três arquivos e anexos em `/tmp/balcao/uploads`, a mesma pasta para todas as cópias. Com o endereço vindo da configuração, `npm run up` dá a cada cópia o seu.
 - **R3 — Prisma só nos repositórios.** O worker criava o próprio `PrismaClient` com `process.env.DATABASE_URL`, fora da configuração e dos repositórios. G4 só protege `http/`; R3 protege serviços, worker e integrações.
 
+- **R4 — a documentação não mente.** O `CLAUDE.md` antigo mandava rodar `npm run migrate` e criar rotas em `api/src/controllers/`, que não existem; agente lê isso na abertura da sessão e acredita. E o primeiro `AGENTS.md` deste harness repetiu o erro com caminhos relativos ([incidente 4](incidentes.md)). R4 confere cada trecho entre crases: script npm no `package.json` certo (inclusive depois de `cd`), arquivo de `node`/`bash` e caminho. Placeholders `<...>` são aceitos; `.balcao/` é criado pela subida.
+
 ## Exemplos de violação das regras próprias
 
 Ficam em `harness/kit/violacoes/R*` no formato do `kit-gates/`. Para aplicar (com `git status` limpo e dependências instaladas):
@@ -58,7 +61,15 @@ bash harness/kit/verificar.sh . "npm run gates" R2
 bash harness/kit/verificar.sh . "npm run gates" R3
 ```
 
-O script planta cada violação, roda os gates, confere a linha com o ID e o arquivo e desfaz tudo. Para aplicar um exemplo à mão, copie o `.modelo` para o caminho indicado sem a extensão (ex.: `harness/kit/violacoes/R2-a-url-fixa-no-front/arquivos/web/src/api/relatorios.ts.modelo` → `web/src/api/relatorios.ts`), rode `npm run gates` e apague o arquivo.
+O script planta cada violação, roda os gates, confere a linha com o ID e o arquivo e desfaz tudo.
+
+R4 age sobre um arquivo que já existe, então o exemplo é um patch:
+
+```bash
+git apply harness/exemplos/R4-agents-cita-o-que-nao-existe.patch
+npm run gates        # falha: R4 AGENTS.md:<linha> script npm inexistente ... / caminho inexistente ...
+git checkout AGENTS.md
+``` Para aplicar um exemplo à mão, copie o `.modelo` para o caminho indicado sem a extensão (ex.: `harness/kit/violacoes/R2-a-url-fixa-no-front/arquivos/web/src/api/relatorios.ts.modelo` → `web/src/api/relatorios.ts`), rode `npm run gates` e apague o arquivo.
 
 ## Mexeu na configuração de um gate? Rode os dois kits
 

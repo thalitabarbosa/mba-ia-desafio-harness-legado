@@ -10,6 +10,7 @@
 //   G4 G6 G7 G8 G9 R3  dependency-cruiser (.dependency-cruiser.cjs)
 //   G5 R1 R2  scripts/gates/regras.mjs (AST do TypeScript)
 //   G10 knip (knip.json)
+//   R4  scripts/gates/docs.mjs (todo caminho e comando do AGENTS.md existe)
 //
 // Opções: --only G1,G2   roda só os grupos que cobrem essas regras (o hook usa)
 import { spawn } from 'node:child_process'
@@ -135,6 +136,16 @@ async function regrasAst() {
   }
 }
 
+async function documentacao() {
+  const r = await executar(process.execPath, [path.join(RAIZ, 'scripts/gates/docs.mjs'), '--json'])
+  try {
+    const lista = JSON.parse(r.stdout)
+    return { violacoes: lista.map((v) => ({ id: v.id, arquivo: v.arquivo, detalhe: `:${v.linha} ${v.mensagem}` })) }
+  } catch {
+    return { violacoes: [{ id: 'R4', arquivo: 'scripts/gates/docs.mjs', detalhe: 'verificador não rodou' }], erro: ultimas(r.stdout + r.stderr) }
+  }
+}
+
 const TIPOS_DE_DEPENDENCIA = ['dependencies', 'devDependencies', 'optionalPeerDependencies', 'unlisted', 'binaries', 'unresolved']
 const ROTULOS = {
   files: 'arquivo sem uso',
@@ -192,6 +203,7 @@ const GRUPOS = [
   { nome: 'dependências (dependency-cruiser)', regras: ['G4', 'G6', 'G7', 'G8', 'G9', 'R3'], fn: dependencias },
   { nome: 'env, supressões e endereços (AST)', regras: ['G5', 'R1', 'R2'], fn: regrasAst },
   { nome: 'código morto (knip)', regras: ['G10'], fn: codigoMorto },
+  { nome: 'documentação para agentes (AGENTS.md)', regras: ['R4'], fn: documentacao },
 ]
 
 const escolhidos = GRUPOS.filter((g) => !somente || g.regras.some((r) => somente.has(r)))

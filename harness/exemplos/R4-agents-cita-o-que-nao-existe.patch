@@ -1,0 +1,12 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index ebcb12a..1dbca58 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -13,6 +13,7 @@ Responda em português. Este arquivo é o índice; o detalhe está em `docs/`.
+   Rode antes de dizer que terminou. O hook de pre-commit roda o mesmo comando.
+ - `cd blackbox && npm ci && API_URL=<API impressa pelo up> npm test` — contrato HTTP.
+ - Logs e portas da cópia: `.balcao/logs/`, `.balcao/portas`.
++- Depois de mudar o schema: `cd api && npm run migrate`; rotas novas em `api/src/controllers/`.
+ 
+ ## Contas da seed
+ 

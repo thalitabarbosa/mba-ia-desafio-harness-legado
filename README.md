@@ -28,7 +28,7 @@ Na raiz do clone (ou de qualquer worktree):
 | `npm run up` | Sobe o Balcão desta cópia: instala dependências (`npm ci`), sobe o Postgres, roda migrations e seed, inicia API, worker e front, e ativa o hook do Git. Pode rodar de novo sem derrubar antes. |
 | `npm run down` | Derruba tudo o que a subida desta cópia iniciou (API, worker, front e o container do Postgres), sem tocar em outras cópias. Os dados ficam no volume. |
 | `npm run down -- --apagar-dados` | Idem, e apaga o banco da cópia. |
-| `npm run gates` | Roda todas as verificações (G1 a G10 e R1 a R3) e lista as violações, uma por linha. |
+| `npm run gates` | Roda todas as verificações (G1 a G10 e R1 a R4) e lista as violações, uma por linha. |
 
 ### O que a subida informa
 
@@ -91,8 +91,9 @@ A IA roda em modo fake por padrão (classifica por palavras-chave, sem chave nen
 | R1 | Comentário de supressão (`eslint-disable`, `@ts-ignore`, `@ts-expect-error`, `@ts-nocheck`) em `api/src` e `web/src` | verificador AST próprio |
 | R2 | Endereço fixo (`localhost`, `127.0.0.1`, `0.0.0.0`, `/tmp/`) fora das pastas `config/` | verificador AST próprio |
 | R3 | `@prisma/client` importado fora de `api/src/repositories/` | dependency-cruiser |
+| R4 | Caminho ou comando citado no `AGENTS.md` que não existe | verificador próprio (`scripts/gates/docs.mjs`) |
 
-R1, R2 e R3 são regras próprias; a motivação de cada uma está em [docs/gates.md](docs/gates.md#regras-próprias-motivação).
+R1, R2, R3 e R4 são regras próprias; a motivação de cada uma está em [docs/gates.md](docs/gates.md#regras-próprias-motivação).
 
 **Hook do Git.** `.githooks/pre-commit` roda `npm run gates` (que inclui tipo e lint) e bloqueia o commit se algo falhar. `npm run up` o ativa com `git config core.hooksPath .githooks`.
 
@@ -104,7 +105,13 @@ bash harness/kit/verificar.sh . "npm run gates" R2   # URL fixa da API no front;
 bash harness/kit/verificar.sh . "npm run gates" R3   # worker criando o próprio PrismaClient
 ```
 
-Cada rodada planta o exemplo, roda os gates, confere a linha com a regra e o arquivo e desfaz. Para aplicar à mão, copie o `.modelo` para o caminho indicado dentro de `arquivos/`, sem a extensão `.modelo`, e rode `npm run gates`.
+Cada rodada planta o exemplo, roda os gates, confere a linha com a regra e o arquivo e desfaz. R4 mexe num arquivo existente, então o exemplo é um patch:
+
+```bash
+git apply harness/exemplos/R4-agents-cita-o-que-nao-existe.patch && npm run gates; git checkout AGENTS.md
+```
+
+ Para aplicar à mão, copie o `.modelo` para o caminho indicado dentro de `arquivos/`, sem a extensão `.modelo`, e rode `npm run gates`.
 
 **Testar os gates.** `bash kit-gates/verificar.sh . "npm run gates"` roda o kit oficial; `bash harness/kit/verificar.sh . "npm run gates"` roda o nosso, com outras formas de escrever as mesmas violações (import só de tipo por `import('x')`, `process['env']`, `const { env } = process`, re-export, ciclo de três arquivos…) além dos exemplos de R1 a R3.
 
@@ -136,7 +143,7 @@ Cada rodada planta o exemplo, roda os gates, confere a linha com a regra e o arq
 - [docs/gates.md](docs/gates.md): cada regra, ferramenta, motivação das regras próprias, como corrigir;
 - [docs/ambiente.md](docs/ambiente.md): subida, isolamento, problemas comuns.
 
-Todo comando e caminho citado no `AGENTS.md` existe. A cada erro de agente, o harness muda e o registro aponta o commit.
+Todo comando e caminho citado no `AGENTS.md` existe, e a regra R4 dos gates garante que continue assim. A cada erro de agente, o harness muda e o registro aponta o commit.
 
 ## Registro de incidentes
 
