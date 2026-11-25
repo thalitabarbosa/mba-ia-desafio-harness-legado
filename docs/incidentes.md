@@ -37,4 +37,4 @@ Novas entradas: o que aconteceu, por que o harness deixou acontecer, o que mudou
 - **O que aconteceu.** O agente escreveu a primeira versão do `AGENTS.md` com caminhos relativos à pasta da API: `config/`, `http/`, `repositories/`, `main.ts`, `jobs/triage-worker.ts` e `.env`. A partir da raiz, onde o agente seguinte abre a sessão, nenhum existe. É o mesmo defeito do `CLAUDE.md` antigo (`npm run migrate`, `api/src/controllers/`, `api/tests/`), repetido pelo agente que estava substituindo esse arquivo. Foi pego por uma conferência manual, caminho a caminho.
 - **Por que o harness deixou.** "Todo comando e caminho citado existe" era uma regra só no papel; nada verificava.
 - **Mudança no harness.** Regra própria R4 nos gates (`scripts/gates/docs.mjs`): confere cada trecho entre crases do `AGENTS.md`. Script npm existe no `package.json` da pasta certa (segue os `cd`), arquivo de `node`/`bash` existe, caminho existe. Roda em `npm run gates` e, portanto, no hook de pre-commit. Exemplo de violação: `harness/exemplos/R4-agents-cita-o-que-nao-existe.patch`.
-- **Commit:** `R4_COMMIT`.
+- **Commit:** `0179f29`.
