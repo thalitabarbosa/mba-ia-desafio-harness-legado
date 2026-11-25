@@ -1,0 +1,25 @@
+{
+  "name": "balcao",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "up": "bash scripts/up.sh",
+    "down": "bash scripts/down.sh",
+    "gates": "node scripts/gates/run.mjs",
+    "lint": "eslint api web",
+    "deps": "depcruise api/src web/src --config .dependency-cruiser.cjs",
+    "deadcode": "knip"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "dependency-cruiser": "^18.9.0",
+    "eslint": "^10.15.0",
+    "globals": "^17.14.0",
+    "knip": "^6.48.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.74.0"
+  }
+}

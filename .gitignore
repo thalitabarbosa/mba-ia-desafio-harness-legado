@@ -1,3 +1,5 @@
 node_modules
 .env
 dist
+# estado local de cada cópia (portas, pids, logs, anexos)
+.balcao/
