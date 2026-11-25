@@ -1,5 +1,6 @@
 import { FormEvent, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { errorMessage } from '../utils/errors'
 import { login, register } from '../api/auth'
 
 export default function RegisterPage() {
@@ -16,8 +17,8 @@ export default function RegisterPage() {
       await register(name, email, password)
       await login(email, password)
       navigate('/tickets')
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err) {
+      setError(errorMessage(err))
     }
   }
 

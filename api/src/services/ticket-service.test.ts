@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { TicketService, formatTicketRef } from './ticket-service'
-import { HttpError } from '../http/errors'
-import { CurrentUser, Ticket } from '../domain/ticket'
+import { TicketService } from './ticket-service'
+import { AppError } from '../domain/errors'
+import { CurrentUser, formatTicketRef, Reply, Ticket } from '../domain/ticket'
 import { TicketFilter, TicketRepository, TicketUpdate } from '../repositories/ticket-repository'
 import { ReplyRepository } from '../repositories/reply-repository'
 
@@ -54,10 +54,15 @@ class FakeTicketRepository implements TicketRepository {
 }
 
 class FakeReplyRepository implements ReplyRepository {
-  items: any[] = []
+  items: Reply[] = []
 
   async create(data: { ticketId: string; authorId: string; body: string }) {
-    const reply = { id: `reply-${this.items.length + 1}`, ...data, createdAt: new Date() }
+    const reply: Reply = {
+      id: `reply-${this.items.length + 1}`,
+      ...data,
+      createdAt: new Date(),
+      author: { id: data.authorId, name: 'Autor', role: 'customer' },
+    }
     this.items.push(reply)
     return reply
   }
@@ -70,10 +75,9 @@ const otherAgent: CurrentUser = { id: 'a2', role: 'agent' }
 const admin: CurrentUser = { id: 'adm', role: 'admin' }
 
 async function expectHttpError(promise: Promise<unknown>, status: number, code: string) {
-  const err: any = await promise.catch((e) => e)
-  expect(err).toBeInstanceOf(HttpError)
-  expect(err.status).toBe(status)
-  expect(err.code).toBe(code)
+  const err: unknown = await promise.catch((e: unknown) => e)
+  expect(err).toBeInstanceOf(AppError)
+  expect(err).toMatchObject({ status, code })
 }
 
 describe('TicketService', () => {

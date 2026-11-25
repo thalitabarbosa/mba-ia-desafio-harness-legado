@@ -1,11 +1,14 @@
+import { Reply } from '../domain/ticket'
 import { prisma } from './prisma'
 
+type NewReply = { ticketId: string; authorId: string; body: string }
+
 export interface ReplyRepository {
-  create(data: { ticketId: string; authorId: string; body: string }): Promise<any>
+  create(data: NewReply): Promise<Reply>
 }
 
-export class PrismaReplyRepository implements ReplyRepository {
-  create(data: { ticketId: string; authorId: string; body: string }) {
+class PrismaReplyRepository implements ReplyRepository {
+  create(data: NewReply) {
     return prisma.reply.create({
       data,
       include: { author: { select: { id: true, name: true, role: true } } },

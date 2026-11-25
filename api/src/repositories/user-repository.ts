@@ -1,11 +1,11 @@
-import { User } from '@prisma/client'
+import { Role, User } from '../domain/ticket'
 import { prisma } from './prisma'
 
 export type NewUser = {
   name: string
   email: string
   passwordHash: string
-  role?: 'customer' | 'agent' | 'admin'
+  role?: Role
 }
 
 export interface UserRepository {
@@ -14,7 +14,7 @@ export interface UserRepository {
   create(data: NewUser): Promise<User>
 }
 
-export class PrismaUserRepository implements UserRepository {
+class PrismaUserRepository implements UserRepository {
   findById(id: string) {
     return prisma.user.findUnique({ where: { id } })
   }

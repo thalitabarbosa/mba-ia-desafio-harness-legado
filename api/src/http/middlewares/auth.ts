@@ -1,10 +1,18 @@
 import { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
-
-const secret = process.env.JWT_SECRET || 'dev-secret'
+import { env } from '../../config/env'
+import { AppError } from '../../domain/errors'
+import { CurrentUser, Role } from '../../domain/ticket'
 
 export function signToken(user: { id: string; role: string }) {
-  return jwt.sign({ sub: user.id, role: user.role }, secret, { expiresIn: '8h' })
+  return jwt.sign({ sub: user.id, role: user.role }, env.JWT_SECRET, { expiresIn: '8h' })
+}
+
+// O usuário autenticado fica em res.locals.user (preenchido por requireAuth).
+export function currentUser(res: Response): CurrentUser {
+  const user = res.locals.user as CurrentUser | undefined
+  if (!user) throw new AppError(401, 'unauthorized', 'Token ausente')
+  return user
 }
 
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
@@ -13,17 +21,18 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
     return res.status(401).json({ error: 'unauthorized', message: 'Token ausente' })
   }
   try {
-    const payload: any = jwt.verify(header.slice(7), secret)
-    ;(req as any).user = { id: payload.sub, role: payload.role }
+    const payload = jwt.verify(header.slice(7), env.JWT_SECRET)
+    if (typeof payload === 'string') throw new Error('payload inesperado')
+    res.locals.user = { id: payload.sub as string, role: payload.role as Role } satisfies CurrentUser
     next()
-  } catch (err) {
+  } catch {
     return res.status(401).json({ error: 'unauthorized', message: 'Token inválido' })
   }
 }
 
-export function requireRole(...roles: string[]) {
-  return (req: Request, res: Response, next: NextFunction) => {
-    const user = (req as any).user
+export function requireRole(...roles: Role[]) {
+  return (_req: Request, res: Response, next: NextFunction) => {
+    const user = res.locals.user as CurrentUser | undefined
     if (!user || !roles.includes(user.role)) {
       return res.status(403).json({ error: 'forbidden', message: 'Sem permissão' })
     }
