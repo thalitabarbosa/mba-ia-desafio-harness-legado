@@ -7,9 +7,10 @@
 // Saída: uma linha por violação, "<ID> <arquivo>:<linha> <mensagem>".
 import fs from 'node:fs'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import ts from 'typescript'
 
-const RAIZ = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..')
+const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..')
 const EXTENSOES = /\.(ts|tsx|mts|cts|js|jsx|mjs|cjs)$/
 const PASTAS = ['api/src', 'web/src']
 

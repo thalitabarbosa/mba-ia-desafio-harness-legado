@@ -5,13 +5,14 @@
 // Depois rode `npm ci` na pasta (ou `npm run up`).
 import fs from 'node:fs'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 const [pasta, pacote] = process.argv.slice(2)
 if (!['api', 'web'].includes(pasta) || !pacote) {
   console.error('Uso: node scripts/remover-dependencia.mjs <api|web> <pacote>')
   process.exit(2)
 }
-const raiz = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', pasta)
+const raiz = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', pasta)
 const lerJson = (f) => JSON.parse(fs.readFileSync(path.join(raiz, f), 'utf8'))
 const gravarJson = (f, dados) => fs.writeFileSync(path.join(raiz, f), JSON.stringify(dados, null, 2) + '\n')
 
