@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Hook do Git: roda os gates antes de cada commit e bloqueia o commit se falharem.
+# Ativado por `npm run up` (git config core.hooksPath .githooks).
+#
+# Roda o comando de gates completo (scripts/gates/run.mjs), que inclui:
+#   G1 tipos   -> tsc --noEmit em api/ e web/
+#   G2 lint    -> eslint api web (erro ou warning bloqueia)
+#   G3 testes unitários, G4-G9 e R1-R3 regras de camada, G10 código morto
+# Os gates olham a árvore de trabalho inteira, não só o que está no stage.
+set -u
+cd "$(git rev-parse --show-toplevel)" || exit 1
+
+if [ ! -x node_modules/.bin/eslint ] || [ ! -x api/node_modules/.bin/tsc ] || [ ! -x web/node_modules/.bin/tsc ]; then
+  echo "pre-commit: dependências não instaladas. Rode 'npm run up' antes de commitar." >&2
+  exit 1
+fi
+
+if ! node scripts/gates/run.mjs; then
+  echo >&2
+  echo "pre-commit: commit bloqueado pelos gates. Corrija as violações acima (detalhes em docs/gates.md)." >&2
+  exit 1
+fi
