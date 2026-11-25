@@ -1,0 +1,4 @@
+export async function contar(): Promise<number> {
+  const { prisma } = await import('../../repositories/prisma')
+  return prisma.ticket.count()
+}

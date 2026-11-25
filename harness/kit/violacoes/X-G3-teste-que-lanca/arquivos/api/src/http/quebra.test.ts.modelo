@@ -1,0 +1,7 @@
+import { describe, it } from 'vitest'
+
+describe('quebra', () => {
+  it('lança', () => {
+    throw new Error('falhou de propósito')
+  })
+})

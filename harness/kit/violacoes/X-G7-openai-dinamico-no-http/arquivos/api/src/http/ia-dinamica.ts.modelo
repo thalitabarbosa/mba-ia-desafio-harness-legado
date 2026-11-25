@@ -1,0 +1,4 @@
+export async function cliente() {
+  const { default: OpenAI } = await import('openai')
+  return new OpenAI({ apiKey: 'x' })
+}

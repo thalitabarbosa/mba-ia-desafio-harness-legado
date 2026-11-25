@@ -1,0 +1,1 @@
+export type Papel = import('../../../api/src/domain/ticket').Role

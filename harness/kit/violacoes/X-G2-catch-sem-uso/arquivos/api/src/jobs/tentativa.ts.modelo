@@ -1,0 +1,8 @@
+export function tentar(fn: () => void): boolean {
+  try {
+    fn()
+    return true
+  } catch (erro) {
+    return false
+  }
+}

@@ -1,0 +1,3 @@
+import type { ClientOptions } from 'openai'
+
+export const opcoes: ClientOptions = { apiKey: 'x' }

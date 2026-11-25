@@ -1,0 +1,5 @@
+export function prazoFinal(horas: number): number {
+  // @ts-ignore
+  const dias: number = `${horas / 24} dias`
+  return dias
+}

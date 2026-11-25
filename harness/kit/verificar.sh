@@ -1,0 +1,1 @@
+../../kit-gates/verificar.sh

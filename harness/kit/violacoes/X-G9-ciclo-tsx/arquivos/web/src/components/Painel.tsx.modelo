@@ -1,0 +1,5 @@
+import Rodape from './Rodape'
+export default function Painel() {
+  return <Rodape />
+}
+export const titulo = 'Painel'

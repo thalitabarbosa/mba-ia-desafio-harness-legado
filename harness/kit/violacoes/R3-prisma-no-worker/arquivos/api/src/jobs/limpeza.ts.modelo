@@ -1,0 +1,8 @@
+import { PrismaClient } from '@prisma/client'
+
+const banco = new PrismaClient()
+
+export async function limpar(): Promise<number> {
+  const { count } = await banco.reply.deleteMany({ where: { body: '' } })
+  return count
+}

@@ -1,0 +1,5 @@
+import type { Ticket } from './ticket'
+
+export function rotular(status: string): string {
+  return status.toUpperCase()
+}

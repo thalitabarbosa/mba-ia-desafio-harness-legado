@@ -1,0 +1,7 @@
+import type { Ticket } from './ticket'
+
+export type TicketResumo = Pick<Ticket, 'id' | 'title'>
+
+export function resumir(t: Ticket): string {
+  return t.title
+}

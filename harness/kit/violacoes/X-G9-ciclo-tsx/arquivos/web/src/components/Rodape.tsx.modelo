@@ -1,0 +1,4 @@
+import { titulo } from './Painel'
+export default function Rodape() {
+  return <footer>{titulo}</footer>
+}

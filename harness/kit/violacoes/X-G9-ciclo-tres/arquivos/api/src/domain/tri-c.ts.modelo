@@ -1,0 +1,2 @@
+import { a } from './tri-a'
+export const c = (): number => (Math.random() > 2 ? a() : 0)

@@ -1,0 +1,6 @@
+import { expect, it } from 'vitest'
+import { resumir } from './ticket-extra'
+
+it('resume', () => {
+  expect(resumir({ title: 'x' } as never)).toBe('x')
+})

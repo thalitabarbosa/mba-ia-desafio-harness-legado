@@ -1,0 +1,1 @@
+export const modo = globalThis.process.env.AI_MODE

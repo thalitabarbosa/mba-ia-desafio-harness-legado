@@ -1,0 +1,4 @@
+export default function Contador({ total }: { total: number }) {
+  const rotulo: number = `${total} itens`
+  return <span>{rotulo}</span>
+}
